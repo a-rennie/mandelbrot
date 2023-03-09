@@ -8,6 +8,7 @@ use sdl2::pixels::Color;
 use sdl2::rect::Point;
 use std::time::Duration;
 use prisma::encoding::{EncodableColor, TranscodableColor, SrgbEncoding};
+use prisma::Rgb;
 
 fn mandelbrot(coord: Complex<f64>, max_iter: u64) -> u64 {
     let mut iteration = 0;
@@ -19,10 +20,10 @@ fn mandelbrot(coord: Complex<f64>, max_iter: u64) -> u64 {
     iteration
 }
 
-const ZOOM: f64 = 1.0 / 4.5e-14;
+const ZOOM: f64 = 1.0 / 0.00065;
 const MAX_ITER: u64 = 1000;
-const X_OFFSET: f64 = -0.7336438924199521;
-const Y_OFFSET: f64 = 0.2455211406714035;
+const X_OFFSET: f64 = -0.7445;
+const Y_OFFSET: f64 = 0.1127;
 const MIN_X: f64 = -2.0;
 const MAX_X: f64 = 1.0;
 const MIN_Y: f64 = -1.0;
@@ -63,7 +64,7 @@ pub fn main() {
                 if iteration < MAX_ITER { 1.0 } else { 0.0 },
             );
             let colour = prisma::Rgb::from_color(&colour);
-            let colour = colour.encode(SrgbEncoding);
+            //let colour = colour.encode(SrgbEncoding);
             let red: f64 = colour.red() * 255.0;
             let blue: f64 = colour.blue() * 255.0;
             let green: f64 = colour.green() * 255.0;
