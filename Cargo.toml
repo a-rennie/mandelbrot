@@ -4,9 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-angular-units = "0.2.4"
+colorsys = "0.6.7"
 num = "0.4.0"
-prisma = "0.1.1"
 sdl2 = "0.35.2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
