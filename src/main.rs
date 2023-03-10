@@ -21,10 +21,10 @@ fn mandelbrot(coord: Complex<f64>, max_iter: u64) -> u64 {
     iteration
 }
 
-const ZOOM: f64 = 1.0;// / 0.00065;
+const ZOOM: f64 = 1.0 / 0.00065;
 const MAX_ITER: u64 = 1000;
-const X_OFFSET: f64 = 0.0;//-0.7445;
-const Y_OFFSET: f64 = 0.0;//0.1127;
+const X_OFFSET: f64 = -0.7445;
+const Y_OFFSET: f64 = 0.1127;
 const MIN_X: f64 = -2.0;
 const MAX_X: f64 = 1.0;
 const MIN_Y: f64 = -1.0;
@@ -135,7 +135,7 @@ pub fn main() {
             }
 
             let colour = prisma::Hsv::new(
-                Deg(2.0 * (180.0 - (180.0 * hue.abs()))),
+                Deg(359.9 * hue.abs()),
                 1.0,
                 if iteration < MAX_ITER as u64 { 1.0 } else { 0.0 },
             );
