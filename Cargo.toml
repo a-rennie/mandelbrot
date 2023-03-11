@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 colorsys = "0.6.7"
+image = "0.24.5"
 num = "0.4.0"
 sdl2 = "0.35.2"
 

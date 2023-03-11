@@ -1,12 +1,12 @@
-use std::collections::HashMap;
+use colorsys::{Hsl, Rgb};
+use image::{Rgb as image_rgb, RgbImage};
 use num::complex::ComplexFloat;
 use num::Complex;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
-use std::time::Duration;
-use colorsys::{Rgb, Hsl};
+use std::collections::HashMap;
 
 fn mandelbrot(coord: Complex<f64>, max_iter: u64) -> u64 {
     let mut iteration = 0;
@@ -18,16 +18,16 @@ fn mandelbrot(coord: Complex<f64>, max_iter: u64) -> u64 {
     iteration
 }
 
-const ZOOM: f64 = 1.0 / 0.00065;
-const MAX_ITER: u64 = 500;
-const X_OFFSET: f64 = -0.7445;
-const Y_OFFSET: f64 = 0.1127;
-const MIN_X: f64 = -2.0;
-const MAX_X: f64 = 1.0;
-const MIN_Y: f64 = -1.0;
-const MAX_Y: f64 = 1.0;
+const ZOOM: f64 = 1.0 / 2.076078511869575e-7; // 1.0 for full set;
+const MAX_ITER: u64 = 10000;
+const X_OFFSET: f64 = 0.4325684481884891; //0.0 for full set;
+const Y_OFFSET: f64 = 0.22611198415267986; //o.0 for full set;
+const MIN_X: f64 = -2.0; //-2.0 recommended
+const MAX_X: f64 = 1.0; //1.0 recommended
+const MIN_Y: f64 = -1.2; //-1.2 recommended
+const MAX_Y: f64 = 1.2; // 1.2 recommended
 
-const SIZE: f64 = 500.0;
+const SIZE: f64 = 5000.0; //500 is recommended
 
 const WIDTH: i32 = (SIZE * (MAX_X - MIN_X)) as i32;
 const HEIGHT: i32 = (SIZE * (MAX_Y - MIN_Y)) as i32;
@@ -62,34 +62,14 @@ pub fn main() {
                 iter_per_pixel[iteration as usize] += 1;
             }
             iteration_counts.insert((i, j), iteration);
-            //let iteration = format!("000000{:X}", iteration);
-            //println!("{iteration}");
-            /*
-            let colour = prisma::Hsv::new(
-                Deg(180.0 * (iteration as f64 / MAX_ITER as f64)),
-                1.0,
-                if iteration < MAX_ITER { 1.0 } else { 0.0 },
-            );
-            let colour = prisma::Rgb::from_color(&colour);
-            //let colour = colour.encode(SrgbEncoding);
-            let red: f64 = colour.red() * 255.0;
-            let blue: f64 = colour.blue() * 255.0;
-            let green: f64 = colour.green() * 255.0;
-
-            let red = red.round() as u8;
-            let blue = blue.round() as u8;
-            let green = green.round() as u8;
-             */
-            /*
-            let iteration = &iteration[iteration.len() - 6 .. iteration.len()];
-
-            let rgbvals = decode_hex(iteration).unwrap();
-            let red = rgbvals[0];
-            let green = rgbvals[1];
-            let blue = rgbvals[2];
-            */
-            canvas.set_draw_color(Color::RGB(((iteration / MAX_ITER) * 255) as u8, ((iteration / MAX_ITER) * 255) as u8, ((iteration / MAX_ITER) * 255) as u8));
-            canvas.draw_point(Point::new(i, j));
+            canvas.set_draw_color(Color::RGB(
+                ((iteration / MAX_ITER) * 255) as u8,
+                ((iteration / MAX_ITER) * 255) as u8,
+                ((iteration / MAX_ITER) * 255) as u8,
+            ));
+            canvas
+                .draw_point(Point::new(i, j))
+                .expect("failed to draw pixel");
             for event in event_pump.poll_iter() {
                 match event {
                     Event::Quit { .. }
@@ -108,40 +88,34 @@ pub fn main() {
         canvas.present();
         //  ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
-    //let mut i = 0;
-
-    /*
-    for w in 0..WIDTH {
-        for h in 0..HEIGHT {
-            i = iteration_counts[&(w, h)];
-            iter_per_pixel[i as usize] += 1;
-        }
-    }
-*/
     let total: u32 = iter_per_pixel.iter().sum();
 
-    let mut hue = 0.0;
-    let mut iteration = 0;
+    let mut hue;
+    let mut iteration;
+
+    let mut pixels = HashMap::new();
+    let mut image = RgbImage::new(WIDTH as u32, HEIGHT as u32);
 
     for w in 0..WIDTH {
         for h in 0..HEIGHT {
             iteration = iteration_counts[&(w, h)];
             hue = 0.0;
-            for i in 0..iteration {
-                hue += iter_per_pixel[i as usize] as f64 / total as f64;
+            if iteration < MAX_ITER {
+                for i in 0..iteration {
+                    hue += iter_per_pixel[i as usize] as f64 / total as f64;
+                }
             }
 
-            //let colour = prisma::Hsv::new(
-            //    Deg(359.9 * hue.abs()),
-            //    1.0,
-            //    if iteration < MAX_ITER as u64 { 1.0 } else { 0.0 },
-            //);
+            hue *= 2.0;
+            if hue > 1.0 {
+                hue -= 1.0
+            }
 
             let colour = Hsl::new(
                 360.0 * hue,
-                75.0,
-                if iteration < MAX_ITER as u64 { 50.0 } else { 0.0 },
-                None
+                100.0,
+                if iteration < MAX_ITER { 40.0 } else { 0.0 },
+                None,
             );
             //let colour = prisma::Rgb::from_color(&colour);
             let colour = Rgb::from(colour);
@@ -154,13 +128,22 @@ pub fn main() {
             let blue = blue.round() as u8;
             let green = green.round() as u8;
             canvas.set_draw_color(Color::RGB(red, green, blue));
-            canvas.draw_point(Point::new(w, h));
+            canvas
+                .draw_point(Point::new(w, h))
+                .expect("failed to draw pixel");
+            pixels.insert((w, h), [red, green, blue]);
             //println!("{}", hue[&(w, h)])
         }
         canvas.present();
-
     }
 
+    for w in 0..WIDTH as u32 {
+        for h in 0..HEIGHT as u32 {
+            image.put_pixel(w, h, image_rgb(pixels[&(w as i32, h as i32)]))
+        }
+    }
+    image.save("output.png").unwrap();
+    println!("image saved");
     //canvas.present();
     'keepopen: loop {
         for event in event_pump.poll_iter() {
