@@ -18,16 +18,16 @@ fn mandelbrot(coord: Complex<f64>, max_iter: u64) -> u64 {
     iteration
 }
 
-const ZOOM: f64 = 1.0 / 2.076078511869575e-7; // 1.0 for full set;
-const MAX_ITER: u64 = 10000;
-const X_OFFSET: f64 = 0.4325684481884891; //0.0 for full set;
-const Y_OFFSET: f64 = 0.22611198415267986; //o.0 for full set;
+const ZOOM: f64 = 1.0 / 4.857412978929758e-13; // 1.0 for full set;
+const MAX_ITER: u64 = 1;
+const X_OFFSET: f64 = -0.7473294854258523; //0.0 for full set;
+const Y_OFFSET: f64 = 0.1003099987321569; //o.0 for full set;
 const MIN_X: f64 = -2.0; //-2.0 recommended
 const MAX_X: f64 = 1.0; //1.0 recommended
 const MIN_Y: f64 = -1.2; //-1.2 recommended
 const MAX_Y: f64 = 1.2; // 1.2 recommended
 
-const SIZE: f64 = 5000.0; //500 is recommended
+const SIZE: f64 = 500.0; //500 is recommended
 
 const WIDTH: i32 = (SIZE * (MAX_X - MIN_X)) as i32;
 const HEIGHT: i32 = (SIZE * (MAX_Y - MIN_Y)) as i32;
@@ -117,9 +117,7 @@ pub fn main() {
                 if iteration < MAX_ITER { 40.0 } else { 0.0 },
                 None,
             );
-            //let colour = prisma::Rgb::from_color(&colour);
             let colour = Rgb::from(colour);
-            //let colour = colour.encode(SrgbEncoding);
             let red: f64 = colour.red();
             let blue: f64 = colour.blue();
             let green: f64 = colour.green();
@@ -143,7 +141,7 @@ pub fn main() {
         }
     }
     image.save("output.png").unwrap();
-    println!("image saved");
+    println!("Image saved");
     //canvas.present();
     'keepopen: loop {
         for event in event_pump.poll_iter() {
