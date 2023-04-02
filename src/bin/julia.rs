@@ -2,34 +2,32 @@ use colorsys::{Hsl, Rgb};
 use image::{Rgb as image_rgb, RgbImage};
 use num::complex::ComplexFloat;
 use num::Complex;
-// use sdl2::event::Event;
-// use sdl2::keyboard::Keycode;
-// use sdl2::pixels::Color;
-// use sdl2::rect::Point;
 use std::collections::HashMap;
 use std::time;
 
-fn mandelbrot(coord: Complex<f64>, max_iter: u64) -> u64 {
+fn julia(offset: Complex<f64>, coord: Complex<f64>, max_iter: u64) -> u64 {
     let mut iteration = 0;
-    let mut z = Complex::new(0.0, 0.0);
+    let mut z = coord;
     while z.abs() <= 4.0 && iteration < max_iter {
-        z = z * z + coord;
+        z = z * z + offset;
         iteration += 1
     }
     iteration
 }
 
-
-const ZOOM: f64 = 1.0 / 0.000007456880595481421; // 1.0 for full set;
-const MAX_ITER: u64 = 10000;
-const X_OFFSET: f64 = -1.250671108539081; //0.0 for full set;
-const Y_OFFSET: f64 = 0.020120407479658035; //0.0 for full set;
+const ZOOM: f64 = 1.0 / 0.0467390676713746; // 1.0 for full set;
+const MAX_ITER: u64 = 5000;
+const X_OFFSET: f64 = -0.19133364725243177; //0.0 for full set;
+const Y_OFFSET: f64 = -0.31810868894909694; //0.0 for full set;
 const MIN_X: f64 = -2.0; //-2.0 recommended
 const MAX_X: f64 = 1.0; //1.0 recommended
 const MIN_Y: f64 = -1.2; //-1.2 recommended
 const MAX_Y: f64 = 1.2; // 1.2 recommended
 
-const SIZE: f64 = 10000.0; //500 is recommended
+const JULIA_X_OFFSET: f64 = 0.10535557506584722;
+const JULIA_Y_OFFSET: f64 = -0.6005267778753294;
+
+const SIZE: f64 = 500.0; //500 is recommended
 
 const WIDTH: i32 = (SIZE * (MAX_X - MIN_X)) as i32;
 const HEIGHT: i32 = (SIZE * (MAX_Y - MIN_Y)) as i32;
@@ -46,7 +44,7 @@ fn main() {
             let x0 = (((((MAX_X - MIN_X) / WIDTH as f64) * w as f64) + MIN_X) / ZOOM) + X_OFFSET;
             let y0 = (((((MAX_Y - MIN_Y) / HEIGHT as f64) * h as f64) + MIN_Y) / ZOOM) + Y_OFFSET;
             let scaledcoords = Complex::new(x0, y0);
-            iteration = mandelbrot(scaledcoords, MAX_ITER);
+            iteration = julia(Complex::new(JULIA_X_OFFSET, JULIA_Y_OFFSET), scaledcoords, MAX_ITER);
 
             if iteration < MAX_ITER{
                 iter_per_pixel[iteration as usize] += 1;
