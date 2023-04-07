@@ -30,7 +30,7 @@ const MAX_X: f64 = 1.0; //1.0 recommended
 const MIN_Y: f64 = -1.2; //-1.2 recommended
 const MAX_Y: f64 = 1.2; // 1.2 recommended
 
-const SIZE: f64 = 1000.0; //500 is recommended
+const SIZE: f64 = 5000.0; //500 is recommended
 
 const WIDTH: i32 = (SIZE * (MAX_X - MIN_X)) as i32;
 const HEIGHT: i32 = (SIZE * (MAX_Y - MIN_Y)) as i32;
@@ -58,9 +58,9 @@ fn main() {
     let iterationmap: Vec<_> = coords
         .par_iter()
         .map(|&i| {
-            if i.0 == i.1 {
+            if i.1 == 0 {
                 counter.fetch_add(1, atomic::Ordering::Relaxed);
-                print!("\rLoop 1 {:?}/{}", counter, HEIGHT);
+                print!("\rLoop 1 {:?}/{}", counter, WIDTH);
             };
             (
                 mandelbrot(
@@ -101,9 +101,9 @@ fn main() {
             let currentcoords = i.0;
             let mut hue = 0.0;
 
-            if currentcoords.0 == currentcoords.1 {
+            if currentcoords.1 == 0 {
                 counter.fetch_add(1, atomic::Ordering::Relaxed);
-                print!("\rLoop 2 {:?}/{}", counter, HEIGHT);
+                print!("\rLoop 2 {:?}/{}", counter, WIDTH);
             }
 
             if iteration < MAX_ITER {
