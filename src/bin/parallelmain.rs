@@ -8,6 +8,7 @@ use num::Complex;
 // use sdl2::rect::Point;
 use rayon::prelude::*;
 use std::collections::HashMap;
+use std::sync::atomic;
 use std::time;
 
 fn mandelbrot(coord: Complex<f64>, max_iter: u64) -> u64 {
@@ -20,10 +21,10 @@ fn mandelbrot(coord: Complex<f64>, max_iter: u64) -> u64 {
     iteration
 }
 
-const ZOOM: f64 = 1.0 / 4.2e-12; // / 0.000007456880595481421; // 1.0 for full set;
+const ZOOM: f64 = 1.0; // 1.0 for full set;
 const MAX_ITER: u64 = 10000;
-const X_OFFSET: f64 = 0.3369844464873; //0.0 for full set;
-const Y_OFFSET: f64 = 0.0487782196791; //0.0 for full set;
+const X_OFFSET: f64 = 0.0; //0.0 for full set;
+const Y_OFFSET: f64 = 0.0; //0.0 for full set;
 const MIN_X: f64 = -2.0; //-2.0 recommended
 const MAX_X: f64 = 1.0; //1.0 recommended
 const MIN_Y: f64 = -1.2; //-1.2 recommended
@@ -52,15 +53,14 @@ fn main() {
         }
     }
 
+    let counter = atomic::AtomicI32::new(0);
+
     let iterationmap: Vec<_> = coords
         .par_iter()
         .map(|&i| {
             if i.0 == i.1 {
-                print!(
-                    "\rTime so far: {:?} idk there should be like {} of these messages",
-                    time_taken.elapsed(),
-                    HEIGHT
-                )
+                counter.fetch_add(1, atomic::Ordering::Relaxed);
+                print!("\rLoop 1 {:?}/{}", counter, HEIGHT);
             };
             (
                 mandelbrot(
@@ -78,7 +78,6 @@ fn main() {
 
     let mut coords: (i32, i32);
 
-
     for i in iterationmap {
         iteration = i.0;
         coords = i.1;
@@ -88,48 +87,55 @@ fn main() {
         iteration_counts.insert(coords, iteration);
     }
 
-
     let total: u32 = iter_per_pixel.par_iter().sum();
 
-    println!();
+    println!("\nLoop 1 finished in {:?}", time_taken.elapsed());
 
     //println!("{:?}",iteration_counts.iter());
+    let counter = atomic::AtomicI32::new(0);
 
-    let pixels: HashMap<(i32, i32), [u8; 3]> = iteration_counts.par_iter().map(|i| {
-        let iteration = i.1.to_owned();
-        let currentcoords = i.0;
-        let mut hue = 0.0;
+    let pixels: HashMap<(i32, i32), [u8; 3]> = iteration_counts
+        .par_iter()
+        .map(|i| {
+            let iteration = i.1.to_owned();
+            let currentcoords = i.0;
+            let mut hue = 0.0;
 
-        if iteration < MAX_ITER {
-            for i in 0..iteration {
-                hue += iter_per_pixel[i as usize] as f64 / total as f64;
+            if currentcoords.0 == currentcoords.1 {
+                counter.fetch_add(1, atomic::Ordering::Relaxed);
+                print!("\rLoop 2 {:?}/{}", counter, HEIGHT);
             }
-        }
 
-        hue *= 2.0;
-        if hue > 1.0 {
-            hue -= 1.0
-        }
+            if iteration < MAX_ITER {
+                for i in 0..iteration {
+                    hue += iter_per_pixel[i as usize] as f64 / total as f64;
+                }
+            }
 
-        let colour = Hsl::new(
-            360.0 * hue,
-            100.0,
-            if iteration < MAX_ITER { 40.0 } else { 0.0 },
-            None,
-        );
+            hue *= 2.0;
+            if hue > 1.0 {
+                hue -= 1.0
+            }
 
-        let colour = Rgb::from(colour);
-        let red: f64 = colour.red();
-        let blue: f64 = colour.blue();
-        let green: f64 = colour.green();
+            let colour = Hsl::new(
+                360.0 * hue,
+                100.0,
+                if iteration < MAX_ITER { 40.0 } else { 0.0 },
+                None,
+            );
 
-        let red = red.round() as u8;
-        let blue = blue.round() as u8;
-        let green = green.round() as u8;
+            let colour = Rgb::from(colour);
+            let red: f64 = colour.red();
+            let blue: f64 = colour.blue();
+            let green: f64 = colour.green();
 
-        (currentcoords.to_owned(), [red, green, blue])
+            let red = red.round() as u8;
+            let blue = blue.round() as u8;
+            let green = green.round() as u8;
 
-    }).collect();
+            (currentcoords.to_owned(), [red, green, blue])
+        })
+        .collect();
 
     let mut image = RgbImage::new(WIDTH as u32, HEIGHT as u32);
 
