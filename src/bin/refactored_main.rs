@@ -19,17 +19,16 @@ fn mandelbrot(coord: Complex<f64>, max_iter: u64) -> u64 {
     iteration
 }
 
-
-const ZOOM: f64 = 1.0 / 0.000007456880595481421; // 1.0 for full set;
+const ZOOM: f64 = 1.0 / 4.2e-12; // / 0.000007456880595481421; // 1.0 for full set;
 const MAX_ITER: u64 = 10000;
-const X_OFFSET: f64 = -1.250671108539081; //0.0 for full set;
-const Y_OFFSET: f64 = 0.020120407479658035; //0.0 for full set;
+const X_OFFSET: f64 = 0.3369844464873; //0.0 for full set;
+const Y_OFFSET: f64 = 0.0487782196791; //0.0 for full set;
 const MIN_X: f64 = -2.0; //-2.0 recommended
 const MAX_X: f64 = 1.0; //1.0 recommended
 const MIN_Y: f64 = -1.2; //-1.2 recommended
 const MAX_Y: f64 = 1.2; // 1.2 recommended
 
-const SIZE: f64 = 10000.0; //500 is recommended
+const SIZE: f64 = 1000.0; //500 is recommended
 
 const WIDTH: i32 = (SIZE * (MAX_X - MIN_X)) as i32;
 const HEIGHT: i32 = (SIZE * (MAX_Y - MIN_Y)) as i32;
@@ -48,7 +47,7 @@ fn main() {
             let scaledcoords = Complex::new(x0, y0);
             iteration = mandelbrot(scaledcoords, MAX_ITER);
 
-            if iteration < MAX_ITER{
+            if iteration < MAX_ITER {
                 iter_per_pixel[iteration as usize] += 1;
             }
             iteration_counts.insert((w, h), iteration);

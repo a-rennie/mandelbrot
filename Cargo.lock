@@ -299,6 +299,7 @@ dependencies = [
  "colorsys",
  "image",
  "num",
+ "rayon",
  "sdl2",
 ]
 

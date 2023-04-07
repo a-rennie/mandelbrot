@@ -15,17 +15,17 @@ fn julia(offset: Complex<f64>, coord: Complex<f64>, max_iter: u64) -> u64 {
     iteration
 }
 
-const ZOOM: f64 = 1.0 / 0.0467390676713746; // 1.0 for full set;
+const ZOOM: f64 = 1.0 / 0.0002823785222314; // 1.0 for full set;
 const MAX_ITER: u64 = 5000;
-const X_OFFSET: f64 = -0.19133364725243177; //0.0 for full set;
-const Y_OFFSET: f64 = -0.31810868894909694; //0.0 for full set;
+const X_OFFSET: f64 = 0.053230709144847205; //0.0 for full set;
+const Y_OFFSET: f64 = -0.4985179064621003; //0.0 for full set;
 const MIN_X: f64 = -2.0; //-2.0 recommended
 const MAX_X: f64 = 1.0; //1.0 recommended
 const MIN_Y: f64 = -1.2; //-1.2 recommended
 const MAX_Y: f64 = 1.2; // 1.2 recommended
 
-const JULIA_X_OFFSET: f64 = 0.10535557506584722;
-const JULIA_Y_OFFSET: f64 = -0.6005267778753294;
+const JULIA_X_OFFSET: f64 = 0.29565408252853365;
+const JULIA_Y_OFFSET: f64 = -0.4495171202809482;
 
 const SIZE: f64 = 500.0; //500 is recommended
 
@@ -44,9 +44,13 @@ fn main() {
             let x0 = (((((MAX_X - MIN_X) / WIDTH as f64) * w as f64) + MIN_X) / ZOOM) + X_OFFSET;
             let y0 = (((((MAX_Y - MIN_Y) / HEIGHT as f64) * h as f64) + MIN_Y) / ZOOM) + Y_OFFSET;
             let scaledcoords = Complex::new(x0, y0);
-            iteration = julia(Complex::new(JULIA_X_OFFSET, JULIA_Y_OFFSET), scaledcoords, MAX_ITER);
+            iteration = julia(
+                Complex::new(JULIA_X_OFFSET, JULIA_Y_OFFSET),
+                scaledcoords,
+                MAX_ITER,
+            );
 
-            if iteration < MAX_ITER{
+            if iteration < MAX_ITER {
                 iter_per_pixel[iteration as usize] += 1;
             }
             iteration_counts.insert((w, h), iteration);
